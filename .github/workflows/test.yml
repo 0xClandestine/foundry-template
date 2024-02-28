@@ -27,6 +27,11 @@ jobs:
         with:
           version: nightly
 
+      - name: Run Forge linter
+        run: |
+          forge fmt --check
+        id: lint
+
       - name: Run Forge build
         run: |
           forge --version
