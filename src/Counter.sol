@@ -36,13 +36,19 @@ contract Counter {
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                        CONSTRUCTOR                         */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    constructor(uint256 initialNumber) {
+        _setNumber(initialNumber);
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
     /*                          ACTIONS                           */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
 
-    /// @notice Sets the value of `number` to a new value.
-    /// @dev Emits a `NumberSet` event.
-    /// @param newNumber The new value to set `number` to.
-    function setNumber(uint256 newNumber) public virtual {
+    /// @dev Sets the value of `number` to a new value.
+    function _setNumber(uint256 newNumber) internal virtual {
         /// @solidity memory-safe-assembly
         assembly {
             // Mutate `number` in storage.
@@ -52,9 +58,8 @@ contract Counter {
         }
     }
 
-    /// @notice Increments the value of `number` by 1.
-    /// @dev Emits a `NumberSet` event.
-    function increment() public virtual {
+    /// @dev Increments the value of `number` by 1.
+    function _increment() internal virtual {
         /// @solidity memory-safe-assembly
         assembly {
             // Cache free memory pointer.
@@ -71,5 +76,43 @@ contract Counter {
             // Emit `NumberSet` event.
             log2(0x00, 0x20, _NUMBER_SET_EVENT_SIGNATURE, mload(m))
         }
+    }
+
+    /// @notice Sets the value of `number` to a new value.
+    /// @dev Emits a `NumberSet` event.
+    /// @param newNumber The new value to set `number` to.
+    function setNumber(uint256 newNumber) public virtual {
+        _setNumber(newNumber);
+    }
+
+    /// @notice Increments the value of `number` by 1.
+    /// @dev Emits a `NumberSet` event.
+    function increment() public virtual {
+        _increment();
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:*/
+    /*                          FALLBACK                          */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•*/
+
+    /// @notice Sets the value of `number` to the first 32 bytes of
+    /// calldata if calldata is non-zero, otherwise it increments the
+    /// value of `number` by 1.
+    /// @dev Emits a `NumberSet` event.
+    fallback() external virtual {
+        /// @solidity memory-safe-assembly
+        assembly {
+            if calldatasize() {
+                // Load `newNumber` from the first 32 bytes of calldata.
+                let newNumber := calldataload(0x00)
+                // Mutate `number` in storage.
+                sstore(address(), newNumber)
+                // Emit `NumberSet` event.
+                log2(0x00, 0x20, _NUMBER_SET_EVENT_SIGNATURE, newNumber)
+                // Return.
+                return(0x00, 0x00)
+            }
+        }
+        _increment();
     }
 }
