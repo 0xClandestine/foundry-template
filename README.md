@@ -1,4 +1,4 @@
-## Foundry Template
+# Foundry Template [![Github Actions][gha-badge]][gha] [![Foundry][foundry-badge]][foundry] [![License: The Unlicense][license-badge]][license]
 
 For guidance, refer to the [Foundry Documentation](https://book.getfoundry.sh/).
 
@@ -14,7 +14,7 @@ forge build
 forge test
 ```
 
-### Format
+### Lint
 
 ```shell
 forge fmt
