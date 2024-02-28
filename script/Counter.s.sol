@@ -21,7 +21,8 @@ contract DeployCounter is Script {
 
     function run(uint256 initialNumber) public virtual returns (Counter counter) {
         vm.startBroadcast();
-        counter = new Counter{ salt: computeSalt(counterInitCodeHash(initialNumber)) }(initialNumber);
+        counter =
+            new Counter{ salt: computeSalt(counterInitCodeHash(initialNumber)) }(initialNumber);
         vm.stopBroadcast();
     }
 
